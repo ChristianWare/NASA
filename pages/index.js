@@ -4,7 +4,7 @@ import { useState } from "react";
 import ImagePreview from "../components/ImagePreview";
 
 export default function Home({ items }) {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [photos, setPhotos] = useState(items);
 
   return (
@@ -16,7 +16,39 @@ export default function Home({ items }) {
       </Head>
 
       <main className='main'>
-        <h1>Hello!</h1>
+        <h1 className='title'>Welcome to NASA Gallery</h1>
+        <input
+          id='nasaSearch'
+          onChange={(e) => setSearch(e.target.value)}
+          type='text'
+          className='searchInput'
+          placeholder='search for an image'
+        />
+        <button
+          className='button'
+          disabled={search === ""}
+          onClick={async () => {
+            const results = await fetch(
+              `https://images-api.nasa.gov/search?media_type=image&q=${search}`
+            );
+            const previews = await results.json();
+            setPhotos(await previews.collection.items);
+          }}
+        >
+          Find
+        </button>
+        <div className='fade'>
+          <div className='gridContainer'>
+            {photos &&
+              photos.map((prev) => (
+                <ImagePreview
+                  key={prev.data[0].nasa_id}
+                  thumbnailUrl={prev.links[0].href}
+                  nasaId={prev.data[0].nasa_id}
+                />
+              ))}
+          </div>
+        </div>
       </main>
     </div>
   );
